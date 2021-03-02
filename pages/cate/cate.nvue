@@ -1,0 +1,137 @@
+<template>
+	<view class="cate">
+		<t-title :info="info" />
+		<scroll-view scroll-x :show-scrollbar="false" class="area common_style">
+			<text @tap="handleCut('area_i',i)" :class="{a_con:i===area_i}" class="con" v-for="(item,i) in areas" :key="item">{{item||'全部'}}</text>
+		</scroll-view>
+		<scroll-view scroll-x :show-scrollbar="false" class="lang common_style">
+			<text @tap="handleCut('lang_i',i)" :class="{a_con:i===lang_i}" class="con" v-for="(item,i) in langs" :key="item">{{item||'全部'}}</text>
+		</scroll-view>
+		<scroll-view scroll-x :show-scrollbar="false" class="year common_style">
+			<text @tap="handleCut('year_i',i)" :class="{a_con:i===year_i}" class="con" v-for="(item,i) in years" :key="item">{{item||'全部'}}</text>
+		</scroll-view>
+		<!-- 数据列表 -->
+		<scroll-view scroll-y v-if="list.length>0">
+			<c-list :list="list"></c-list>
+			<t-page @hanglePage="handleCutPage" :page="page+1" :count="list.length" />
+		</scroll-view>
+		<image v-else src="@/static/img/logo/null.png" mode="aspectFit"></image>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import cList from '@/components/common/c-list.nvue';
+	import tPage from '@/components/t-page/t-page.vue';
+	export default {
+		data() {
+			return {
+				areas: ['', '大陆', '香港', '台湾', '美国', '韩国', '日本', '法国', '英国', '德国', '泰国', '印度', '意大利', '西班牙', '加拿大', '其他'],
+				langs: ['', '国语', '英语', '粤语', '闽南语', '日语', '韩语', '法语', '德语', '其他'],
+				year_i: 0,
+				lang_i: 0,
+				area_i: 0,
+				id: 1,
+				page: 0,
+				info: {
+					title: '',
+					back: true,
+					search: true
+				}
+			}
+		},
+		components: {
+			tTitle,
+			cList,
+			tPage,
+		},
+		onLoad(arg) {
+			const {
+				id = 1,
+					area,
+					title
+			} = arg;
+			this.id = id;
+			this.info.title = title;
+			if (area) {
+				this.area_i = this.areas.findIndex(item => area === item)
+			}
+			this.getData()
+		},
+		computed: {
+			years() {
+				const y = new Date().getFullYear();
+				let year = ['']
+				for (let i = 0; i <= 10; i++) {
+					year.push(y - i)
+				}
+				return year;
+			},
+			list() {
+				const list = this.$store.state.cate.currentCateData || [];
+				setTimeout(() => {
+					uni.hideLoading()
+				}, 500)
+				return list;
+			}
+		},
+		methods: {
+			// 切换选项
+			handleCut(v, i) {
+				if (this[v] === i) return;
+				this[v] = i;
+				this.page = 0;
+				this.getData()
+			},
+			// 获取数据
+			getData() {
+				uni.showLoading({
+					title: '加载中~',
+					mask: true
+				})
+				this.$store.commit('alterCurrentCateData', [])
+				const area = this.areas[this.area_i];
+				const lang = this.langs[this.lang_i];
+				const year = this.years[this.year_i];
+				const page = this.page;
+				const id = this.id;
+				this.$store.dispatch('getCateData', {
+					id,
+					area,
+					lang,
+					year,
+					page
+				})
+			},
+			// 切换页码
+			handleCutPage(s) {
+				this.page += s;
+				this.getData();
+			}
+		}
+	}
+</script>
+
+<style>
+	.cate {
+		flex: 1;
+		padding: 0 30rpx;
+	}
+
+	.common_style {
+		flex-direction: row;
+		margin-bottom: 20rpx;
+	}
+
+	.con {
+		font-size: 30rpx;
+		padding: 10rpx 20rpx;
+		color: #999;
+	}
+
+	.a_con {
+		background-color: #fca700;
+		border-radius: 10rpx;
+		color: #fff;
+	}
+</style>

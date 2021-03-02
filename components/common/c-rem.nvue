@@ -1,0 +1,71 @@
+<template>
+	<view class="c_rem">
+		<view class="c_rem_item" v-for="item in list" :key="item.vod_id+new Date().getTime()" @tap="handleVideo(item)">
+			<view class="c_rem_img">
+				<image class="c_rem_img_img" :src="item.vod_pic" mode="widthFix"></image>
+				<text class="sequel">{{item.vod_remarks}}</text>
+			</view>
+			<view class="c_rem_info">
+				<text class="info_text">{{item.vod_name}}</text>
+				<text class="info_text">{{item.vod_blurb}}</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import play_mixin from '@/static/js/play_mixin.js';
+	export default {
+		mixins: [play_mixin],
+		props: {
+			list: Array
+		}
+	}
+</script>
+
+<style>
+	.c_rem {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	.c_rem_item {
+		width: 340rpx;
+		flex-direction: column;
+		margin-bottom: 30rpx;
+	}
+
+	.c_rem_img {
+		height: 200rpx;
+		position: relative;
+	}
+
+	.sequel {
+		position: absolute;
+		color: #fff;
+		font-size: 24rpx;
+		padding: 10rpx 20rpx;
+		border-radius: 20rpx;
+		background-color: rgba(92, 92, 92, .8);
+		bottom: 10rpx;
+		right: 10rpx;
+	}
+
+	.year {
+		left: 10rpx;
+		top: 10rpx;
+	}
+
+	.c_rem_img_img {
+		border-radius: 20rpx;
+	}
+
+	.info_text {
+		font-size: 28rpx;
+		lines: 1;
+		color: #666;
+		padding-top: 10rpx;
+		text-overflow: ellipsis;
+	}
+</style>

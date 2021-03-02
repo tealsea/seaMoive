@@ -1,0 +1,64 @@
+<template>
+	<view class="collect">
+		<t-title :info="info"></t-title>
+		<button type="primary" @tap="handleData">账号数据同步</button>
+		<t-history v-if="list.length>0" :list="list"></t-history>
+		<image v-else src="@/static/img/logo/null.png" mode="aspectFill"></image>
+	</view>
+</template>
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import login_mixin from '@/static/js/login_mixin.js';
+	import tHistory from '@/components/t-history/t-history.vue';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '我的收藏',
+					back: true,
+					search: true
+				},
+				list: [],
+			}
+		},
+		mixins: [login_mixin],
+		components: {
+			tTitle,
+			tHistory
+		},
+		created() {
+			if (this.list.length <= 0) {
+				this.getCollect();
+			}
+		},
+		methods: {
+			// 账号数据同步
+			handleData() {
+				uni.showModal({
+					title: "同步数据提示",
+					content: '收藏数据默认存储在本机内(也会备份到云端)，只有更换手机或本地数据丢失时才需要同步数据。否则会造成没必要的浪费！！！',
+					success: (res) => {
+						if (res.confirm) {
+							uni.showLoading({
+								title: '同步中~'
+							})
+							this.$store.dispatch('getCollect', this.login.id)
+						}
+					}
+				})
+			},
+			// 获取收藏
+			getCollect() {
+				this.list = uni.getStorageSync('seaCollect') || [];
+			}
+		}
+	}
+</script>
+
+<style>
+	.collect {
+		padding: 0 30rpx;
+		flex: 1;
+		background-color: #f1f2f4;
+	}
+</style>

@@ -1,0 +1,49 @@
+<template>
+	<swiper v-if="list" class="swiper" indicator-dots autoplay :interval="5000" circular :duration="1000"
+	 indicator-active-color="#fff">
+		<swiper-item v-for="item in list" :key="item.vod_id+new Date().getTime()" @tap="handleVideo(item)">
+			<view class="swiper-item">
+				<image class="banner_img" :src="item.vod_pic_slide" mode="aspectFill"></image>
+				<text class="title common_style">{{item.vod_name}}</text>
+			</view>
+		</swiper-item>
+	</swiper>
+</template>
+
+<script>
+	import mixin from '@/static/js/play_mixin.js';
+	export default {
+		props: {
+			list: Array
+		},
+		data() {
+			return {
+				interval: 5000
+			}
+		},
+		mixins: [mixin]
+	}
+</script>
+
+<style>
+	.swiper-item {
+		flex: 1;
+	}
+
+	.banner_img {
+		flex: 1;
+		border-radius: 40rpx;
+	}
+
+	.title {
+		width: 690rpx;
+		position: absolute;
+		bottom: 0rpx;
+		left: 0;
+		color: #fff;
+		padding: 20rpx;
+		font-size: 30rpx;
+		lines: 1;
+		text-overflow: ellipsis;
+	}
+</style>

@@ -1,0 +1,77 @@
+<template>
+	<list class="list" :show-scrollbar="false">
+		<cell class="cell" v-for="item in list" :key="item.gboob_id">
+			<view class="item_box">
+				<view class="info">
+					<text class="photo">{{item.gbook_name.slice(0,1)}}</text>
+					<text class="nickname">{{item.gbook_name}}</text>
+				</view>
+				<text class="issue">留言:{{item.gbook_content}}</text>
+				<text class="reply" v-if="item.gbook_reply">管理员：{{item.gbook_reply}}</text>
+			</view>
+		</cell>
+	</list>
+</template>
+
+<script>
+	export default {
+		props: {
+			list: Array
+		}
+	}
+</script>
+
+<style>
+	.list {
+		margin-bottom: 60rpx;
+	}
+
+	.item_box {
+		background-color: #fff;
+		border-radius: 30rpx;
+		margin-top: 30rpx;
+		padding: 20rpx;
+	}
+
+	.info {
+		flex-direction: row;
+		height: 80rpx;
+		align-items: center;
+		padding: 0 30rpx;
+	}
+
+	.photo {
+		width: 80rpx;
+		line-height: 80rpx;
+		font-size: 30rpx;
+		border-radius: 50%;
+		text-align: center;
+		line-height: 80rpx;
+		color: #fff;
+		background-color: #007AFF;
+	}
+
+	.nickname {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #999;
+		padding: 0 30rpx;
+	}
+
+	.issue {
+		font-size: 30rpx;
+		color: teal;
+		background-color: #eee;
+		border-radius: 20rpx;
+		padding: 20rpx;
+		margin: 20rpx 0;
+	}
+
+	.reply {
+		color: #fff;
+		font-size: 30rpx;
+		background-color: #fe8642;
+		border-radius: 30rpx;
+		padding: 30rpx;
+	}
+</style>

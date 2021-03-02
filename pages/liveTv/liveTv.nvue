@@ -1,0 +1,40 @@
+<template>
+	<view>
+		<video id="myVideo" autoplay :controls="false" @fullscreenchange="handleFullScreen" :src="list[id].url"></video>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				id: 0
+			}
+		},
+		computed: {
+			list() {
+				return this.$store.state.live.lives || []
+			}
+		},
+		onLoad(arg) {
+			this.id = arg.id;
+			setTimeout(() => {
+				this.videoContext = uni.createVideoContext('myVideo');
+				this.videoContext.requestFullScreen();
+				plus.screen.lockOrientation("landscape");
+			}, 300)
+		},
+		methods: {
+			//监听全屏
+			handleFullScreen(e) {
+				if (!e.detail.fullScreen) {
+					uni.navigateBack(-1)
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,192 @@
+<template>
+	<view class="login">
+		<tTitle :info="info"></tTitle>
+		<image class="logo" src="@/static/img/logo/logo.png" mode="aspectFit"></image>
+		<view class="login_in" v-if="isLogin">
+			<text class="common_font">账号：</text>
+			<input class="admin common_input common_font" placeholder="请输入账号" :maxlength="10" type="text" v-model="login.admin" />
+			<text class="common_font">密码：</text>
+			<input class="pwd common_input common_font" placeholder="请输入密码" :maxlength="15" type="text" password v-model="login.pwd" />
+			<view class="rest">
+				<text class="forget common_font" @tap="handleForget">忘记密码</text>
+				<text class="go_register common_font" @tap="handleGoLogin">马上注册</text>
+			</view>
+		</view>
+		<!-- 注册 -->
+		<view class="register" v-else>
+			<text class="common_font">注册昵称：</text>
+			<input class="common_input common_font" placeholder="请输入注册昵称" :key='1' :maxlength="10" type="text" v-model="register.nickname" />
+			<text class="common_font">注册账号：</text>
+			<input class="admin common_input common_font" :key="2" placeholder="请输入注册账号" :maxlength="10" type="text" v-model="register.admin" />
+			<text class="common_font">注册密码：</text>
+			<input class="pwd common_input common_font" :key="3" placeholder="请输入注册密码" :maxlength="15" password type="text"
+			 v-model="register.pwd" />
+			<text class="backLogin common_font" @tap="isLogin=true">返回登录</text>
+		</view>
+		<button type="primary" @tap="handleLogin">{{logiTitle}}</button>
+		<text class="explain common_font" @tap="handleExplain">账号说明</text>
+	</view>
+</template>
+
+<script>
+	import high from '@/components/common/high.nvue';
+	import tTitle from '@/components/t-title/t-title.vue'
+	export default {
+		data() {
+			return {
+				isLogin: true,
+				login: {
+					admin: '',
+					pwd: ''
+				},
+				register: {
+					nickname: '',
+					admin: '',
+					pwd: ''
+				},
+				info: {
+					title: '登录',
+					back: true,
+					search: false
+				},
+			}
+		},
+		computed: {
+			logiTitle() {
+				return this.isLogin ? '立即登录' : '马上注册';
+			}
+		},
+		components: {
+			high,
+			tTitle
+		},
+		methods: {
+			// 点击忘记密码
+			handleForget() {
+				const obj = {
+					title: '忘记密码',
+					content: '请加入QQ群(833979066)联系管理员。'
+				}
+				this.modal(obj);
+			},
+			// 点击切换登录或注册
+			handleGoLogin() {
+				this.isLogin = !this.isLogin;
+				this.login = {
+					admin: '',
+					pwd: ''
+				};
+				this.register = {
+					nickname: '',
+					admin: '',
+					pwd: ''
+				};
+			},
+			//点击登录或注册
+			handleLogin() {
+				let admin = '';
+				let password = '';
+				let nick = '';
+				// 收起键盘
+				uni.hideKeyboard()
+				if (this.isLogin) {
+					admin = this.login.admin.trim();
+					password = this.login.pwd.trim();
+				} else {
+					admin = this.register.admin.trim();
+					password = this.register.pwd.trim();
+					nick = this.register.nickname.trim();
+				};
+				if (!admin && !password) {
+					uni.showToast({
+						title: '账号或密码不能为空',
+						icon: 'none'
+					})
+					return
+				}
+				uni.showLoading({
+					title: '正在登录'
+				});
+				if (this.isLogin) {
+					this.$store.dispatch('login_in', {
+						admin,
+						password
+					})
+					return
+				}
+				this.$store.dispatch('register_in', {
+					admin,
+					password,
+					nick
+				})
+			},
+			// 点击说明
+			handleExplain() {
+				const obj = {
+					title: '账号登录说明',
+					content: '账号登录是为了数据的保存，不会泄露个人信息,不登陆账号不影响软件的使用。不登陆账号的问题：1、不能使用收藏功能。2、不能留言评论。如不想注册账号，可进入QQ群(833979066)联系管理员索要账号密码'
+				};
+				this.modal(obj)
+			},
+			// 封装提示框
+			modal(data) {
+				uni.showModal(data);
+			}
+		}
+	}
+</script>
+
+<style>
+	.login {
+		flex: 1;
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+	}
+
+	.common_input {
+		border-width: 1px;
+		height: 80rpx;
+		border-color: #999;
+		padding-left: 20rpx;
+		margin: 20rpx 0;
+		border-radius: 15rpx;
+	}
+
+	.common_font {
+		font-size: 30rpx;
+	}
+
+	.logo {
+		height: 150rpx;
+		margin: 100rpx 0;
+	}
+
+	.rest {
+		height: 80rpx;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.forget {
+		color: #999;
+		text-decoration: underline;
+	}
+
+	.go_register {
+		color: #007AFF;
+		text-decoration: underline;
+	}
+
+	.explain {
+		margin-top: 50rpx;
+		text-align: right;
+		color: red;
+	}
+
+	.backLogin {
+		color: #007AFF;
+		text-align: right;
+		margin: 30rpx 0;
+	}
+</style>

@@ -1,0 +1,153 @@
+<template>
+	<view class="profile">
+		<t-title :info="info" class="rest_search"></t-title>
+		<image class="bg" src="@/static/img/logo/bg.jpg" mode="aspectFill"></image>
+		<view class="login" v-if="login.name">
+			<text class="photo" @tap="handleGoPage(list[0].router)">{{login.name.slice(0,1)}}</text>
+			<text class="nickname" @tap="handleGoPage(list[0].router)">{{login.name}}</text>
+		</view>
+		<view class="login" v-else>
+			<text class="photo" @tap="handleGoPage('/login/login')">&#xe604;</text>
+			<text class="nickname" @tap="handleGoPage('/login/login')">未登录</text>
+		</view>
+		<list scroll-y class="list">
+			<cell class="desc" v-for="item in list" :key="item.name" @tap="handleGoPage(item.router)">
+				<text class="name">{{item.name}}</text>
+				<text class="more">&#xe60e;</text>
+			</cell>
+		</list>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import high from '@/components/common/high.nvue';
+	import cReferral from '@/components/common/c-referral.nvue';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '',
+					back: false,
+					search: true
+				},
+				list: [{
+						name: '我的资料',
+						router: '/mine/mine'
+					}, {
+						name: '我的收藏',
+						router: '/collect/collect'
+					},
+					{
+						name: '历史记录',
+						router: '/history/history'
+					},
+					{
+						name: '求片留言',
+						router: '/beg/beg'
+					},
+					{
+						name: '本地缓存',
+						router: '/cache/cache'
+					},
+					{
+						name: '关于',
+						router: '/regards/regards'
+					},
+					{
+						name: '设置',
+						router: '/setting/setting'
+					}
+				],
+				login: {}
+			}
+		},
+		components: {
+			high,
+			cReferral,
+			tTitle
+		},
+		onShow() {
+			this.login = uni.getStorageSync('logo_cookie') || {};
+		},
+		methods: {
+			// 跳转到指定页面
+			handleGoPage(r) {
+				uni.navigateTo({
+					url: '/pages' + r
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.profile {
+		flex: 1;
+	}
+
+	.rest_search {
+		position: fixed;
+		width: 750rpx;
+		padding-right: 30rpx;
+	}
+
+	.bg {
+		flex: 1;
+		position: fixed;
+	}
+
+	.login {
+		height: 500rpx;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.login .photo {
+		width: 130rpx;
+		line-height: 130rpx;
+		font-family: iconfont;
+		border-radius: 50%;
+		background-color: #f1f2f4;
+		font-size: 50rpx;
+		color: #ffcd42;
+		font-weight: bold;
+		text-align: center;
+		line-height: 130rpx;
+	}
+
+	.login .nickname {
+		font-size: 40rpx;
+		margin-top: 20rpx;
+		color: #eee;
+	}
+
+	.list {
+		border-radius: 50rpx 50rpx 0 0;
+		background-color: #f1f2f4;
+		padding: 40rpx;
+	}
+
+	.desc {
+		height: 100rpx;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+		border-bottom-width: 1px;
+		border-color: #dadbdd;
+	}
+
+	.more {
+		font-family: iconfont;
+		font-size: 40rpx;
+		font-size: 35rpx;
+		font-weight: bold;
+		color: #999;
+	}
+
+	.name {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #666;
+	}
+</style>

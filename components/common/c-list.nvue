@@ -1,0 +1,95 @@
+<template>
+	<view class="c_list">
+		<view class="c_list_item" v-for="item in list" :key="item.vod_id+new Date().getTime()" @tap="handleVideo(item)">
+			<view class="c_list_img">
+				<image lazy-load class="c_list_img_img_f" src="@/static/img/logo/load.png" mode="aspectFit"></image>
+				<image lazy-load class="c_list_img_img" :src="item.vod_pic" mode="aspectFill"></image>
+				<text class="year common_img">{{item.vod_year}}</text>
+				<text class="sequel common_img">{{item.vod_remarks}}</text>
+				<text class="lang common_img">{{item.vod_lang}}</text>
+			</view>
+			<view class="c_list_info">
+				<text class="c_list_name common_info">{{item.vod_name}}</text>
+				<text class="c_list_actor common_info">{{item.vod_actor}}</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import play_mixin from '@/static/js/play_mixin.js';
+	export default {
+		props: {
+			list: Array
+		},
+		mixins: [play_mixin]
+	}
+</script>
+
+<style>
+	.c_list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	.c_list_item {
+		width: 220rpx;
+		margin-bottom: 30rpx;
+	}
+
+	.c_list_img {
+		position: relative;
+	}
+
+	.c_list_img_img_f {
+		flex: 1;
+		position: absolute;
+		left: 0;
+		top: 0;
+		background-color: #ccc;
+		border-radius: 20rpx;
+		/* #ifndef APP-PLUS-NVUE */
+		will-change: transform;
+		/* #endif */
+	}
+
+	.common_img {
+		position: absolute;
+		font-size: 24rpx;
+		color: #fff;
+	}
+
+	.year {
+		right: 10rpx;
+		top: 10rpx;
+	}
+
+	.sequel {
+		bottom: 10rpx;
+		right: 10rpx;
+		lines: 1;
+		text-overflow: ellipsis;
+	}
+
+	.lang {
+		left: 10rpx;
+		top: 10rpx;
+	}
+
+	.c_list_img_img {
+		height: 300rpx;
+		/* #ifndef APP-PLUS-NVUE */
+		will-change: transform;
+		/* #endif */
+		border-radius: 20rpx;
+	}
+
+	.common_info {
+		font-size: 30rpx;
+		color: #333;
+		lines: 1;
+		padding-top: 10rpx;
+		text-overflow: ellipsis;
+	}
+</style>

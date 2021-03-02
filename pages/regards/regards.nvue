@@ -1,0 +1,70 @@
+<template>
+	<view class="regards">
+		<t-title :info="info"></t-title>
+		<text class="title">关于软件</text>
+		<text class="common_font">1、本站只提供页面服务，本站不存储、不制作任何视频。</text>
+		<text class="common_font">2、本站所有的资源均来自互联网。</text>
+		<text class="common_font">3、不承担任何由于内容的合法性及健康性所引起的争议和法律责任。</text>
+		<text class="common_font">4、本站不涉及任何利益(除自愿的赞赏外)。</text>
+		<text class="common_font">5、本站不接受也不存在任何广告(除视频中自带)</text>
+		<text class="common_font">6、本着开源精神开放源代码(写的不好请见谅！)</text>
+		<text class="common_font">7、若侵犯了您的权益，请附说明联系邮箱。本站将在收到通知后24小时内删除。</text>
+		<text class="common_font">邮箱：2697008424@qq.com</text>
+		<view class="code">
+			<text class="common_font code_i">前端：https://www.github.com</text>
+			<text class="common_font code_i">后端：https://www.github.com</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '',
+					back: true,
+					search: false
+				}
+			}
+		},
+		components: {
+			tTitle
+		},
+		methods: {
+
+		}
+	}
+</script>
+
+<style>
+	.regards {
+		flex: 1;
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+	}
+
+	.common_font {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #666;
+		margin-top: 20rpx;
+	}
+
+	.title {
+		font-size: 40rpx;
+		margin: 30rpx 0;
+		font-weight: bold;
+		color: #333;
+		text-align: center;
+	}
+
+	.code {
+		margin-top: 100rpx;
+	}
+
+	.code_i {
+		color: teal;
+	}
+</style>

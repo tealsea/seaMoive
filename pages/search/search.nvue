@@ -1,0 +1,53 @@
+<template>
+	<view class="search">
+		<high />
+		<t-search :t_search_think="think" @handleConfirm="goSearch" @handleKey="getSearchKey" />
+	</view>
+</template>
+
+<script>
+	import tSearch from '@/components/t-search/t-search.nvue';
+	import high from '@/components/common/high.nvue';
+	import cReferral from '@/components/common/c-referral.nvue';
+	export default {
+		data() {
+			return {
+				t_search_think: [],
+				info: {
+					title: '热门推荐',
+					isMore: false
+				}
+			}
+		},
+		components: {
+			tSearch,
+			high,
+			cReferral
+		},
+		computed: {
+			think() {
+				return this.$store.state.search.thinks || [];
+			}
+		},
+		methods: {
+			// 接受输入框的值
+			goSearch(v) {
+				uni.navigateTo({
+					url: '/pages/list/list?wd=' + v
+				})
+			},
+			// 获取关键字
+			getSearchKey(v) {
+				this.$store.dispatch('getThink', v);
+			}
+		}
+	}
+</script>
+
+<style>
+	.search {
+		flex: 1;
+		padding: 0 20rpx;
+		background-color: #f1f2f4;
+	}
+</style>

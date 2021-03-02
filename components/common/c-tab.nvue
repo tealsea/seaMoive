@@ -1,0 +1,77 @@
+<template>
+	<list class="c-tab" scrollable show-scrollbar="false">
+		<!-- 横幅数据 -->
+		<cell v-if="rem[cIndex].banner.length>0">
+			<c-banner :list="rem[cIndex].banner" />
+		</cell>
+		<!-- 推荐数据 -->
+		<cell>
+			<template v-if="rem[cIndex].data.length>0">
+				<c-referral :info="{title:'热门推荐',isMore:false}" />
+				<c-rem :list="rem[cIndex].data" />
+			</template>
+			<!-- 列表数据 -->
+			<view v-for="item in rem" :key="item.id" v-if="cIndex===0">
+				<c-referral :info="item" @handleMore="tapMore" v-if="item.id!==0" />
+				<c-list :list="item.initData" />
+			</view>
+			<view v-for="(item,index) in rem[cIndex].listData" :key="item.area" v-if="cIndex!==0">
+				<c-referral :info="{title:item.area,isMore:true}" @handleMore="tapMore" />
+				<c-list :list="item.data" />
+			</view>
+		</cell>
+	</list>
+</template>
+
+<script>
+	import cBanner from '@/components/common/c-banner.nvue';
+	import cRem from '@/components/common/c-rem.nvue';
+	import cReferral from '@/components/common/c-referral.nvue';
+	import cList from '@/components/common/c-list.nvue';
+	// 集中管理vuex
+	import {
+		mapState
+	}
+	from 'vuex';
+	export default {
+		props: {
+			list: Array,
+			cIndex: Number
+		},
+		data() {
+			return {
+				moveX: 0
+			}
+		},
+		computed: {
+			...mapState({
+				rem: state => state.home.rem,
+				area: state => state.home.area,
+				type: state => state.home.type,
+			})
+		},
+		components: {
+			cBanner,
+			cRem,
+			cReferral,
+			cList
+		},
+		methods: {
+			// 点击更多
+			tapMore(arg) {
+				let id = this.cIndex;
+				let area = '';
+				if (id === 0) {
+					id = arg.id
+				} else {
+					area = arg.title;
+				}
+				const title = this.type[id].type_name;
+				const val = `id=${id}&area=${area}&title=${title}`;
+				uni.navigateTo({
+					url: '/pages/cate/cate?' + val
+				})
+			}
+		}
+	}
+</script>

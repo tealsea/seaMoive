@@ -1,0 +1,49 @@
+<template>
+	<view class="history">
+		<t-title :info="info"></t-title>
+		<t-history v-if="list.length>0" :list="list"></t-history>
+		<image v-else src="@/static/img/logo/null.png" mode="aspectFill"></image>
+	</view>
+</template>
+
+<script>
+	import login_mixin from '@/static/js/login_mixin.js';
+	import tTitle from '@/components/t-title/t-title.vue';
+	import tHistory from '@/components/t-history/t-history.vue';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '历史记录',
+					back: true,
+					search: true
+				},
+				list: []
+			}
+		},
+		created() {
+			if (this.list.length <= 0) {
+				this.getHistory();
+			}
+		},
+		components: {
+			tHistory,
+			tTitle
+		},
+		mixins: [login_mixin],
+		methods: {
+			// 获取历史记录
+			getHistory() {
+				this.list = uni.getStorageSync('seaHistory') || []
+			}
+		}
+	}
+</script>
+
+<style>
+	.history {
+		padding: 0 30rpx;
+		flex: 1;
+		background-color: #f1f2f4;
+	}
+</style>

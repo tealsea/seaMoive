@@ -1,0 +1,206 @@
+<template>
+	<view class="t_search">
+		<!-- 输入相关 -->
+		<view class="searh_box">
+			<!-- 返回按钮 -->
+			<text class="back" @tap="handleBack">&#xe602;</text>
+			<!-- 输入框 -->
+			<view class="search">
+				<text class="search_icon">&#xe601;</text>
+				<input class="search_input" type="text" placeholder="海量影片精彩不停!" :focus="isFocus" confirm-type="search" @confirm="handleConfirm"
+				 @input="handleInput" :value="value" />
+				<text class="search_icon" @tap="handleClear">&#xe608;</text>
+			</view>
+		</view>
+		<!-- 历史记录 -->
+		<view class="history" v-if="isHistory">
+			<view class="history_head">
+				<text class="hi_title">历史记录</text>
+				<text class="hi_clear" @tap="handleHiClear">清空</text>
+			</view>
+			<!-- 历史关键词 -->
+			<view class="hi_main">
+				<text class="hi_main_key" v-for="item in history" :key="item" @tap="handleHiKey(item)">{{item}}</text>
+			</view>
+		</view>
+		<!-- 联想词 -->
+		<view class="think" v-if="value&&t_search_think.length>0">
+			<text class="think_key" v-for="item in t_search_think" @tap="handleThink(item.vod_name)">{{item.vod_name}}</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			t_search_think: {
+				type: Array,
+				default: []
+			},
+			isHistory: {
+				type: Boolean,
+				default: true
+			},
+			isFocus: {
+				type: Boolean,
+				default: true
+			}
+		},
+		data() {
+			return {
+				value: '',
+				timer: null,
+				history: [],
+			}
+		},
+		created() {
+			this.getHistory()
+		},
+		methods: {
+			// 返回上一页
+			handleBack() {
+				uni.navigateBack(-1)
+			},
+			// 输入事件触发
+			handleInput(e) {
+				clearTimeout(this.timer)
+				this.value = e.detail.value.trim();
+				this.$store.commit('alterThink', [])
+				if (this.value) {
+					this.timer = setTimeout(() => {
+						this.$emit('handleKey', this.value)
+					}, 300);
+				}
+			},
+			// 清理关键词
+			handleClear() {
+				this.value = ''
+			},
+			// 点击联想词
+			handleThink(item) {
+				this.value = item;
+				this.handleConfirm();
+			},
+			// 点击键盘搜索
+			handleConfirm() {
+				const key = this.value;
+				this.$emit('handleConfirm', key);
+				const hi = uni.getStorageSync('t_history') || [];
+				if (hi.indexOf(key) > -1) return;
+				hi.unshift(key)
+				if (hi.length > 6) {
+					hi.length = 6;
+				}
+				uni.setStorageSync('t_history', hi)
+				this.getHistory();
+				this.value = '';
+			},
+			// 清空历史记录
+			handleHiClear() {
+				uni.removeStorageSync('t_history');
+				this.getHistory()
+			},
+			// 点击历史记录
+			handleHiKey(item) {
+				this.$emit('handleConfirm', item)
+				this.value = '';
+			},
+			// 获取历史记录
+			getHistory() {
+				this.history = uni.getStorageSync('t_history') || [];
+			}
+		}
+	}
+</script>
+
+<style>
+	.searh_box {
+		flex-direction: row;
+	}
+
+	.back {
+		flex: 1;
+		text-align: center;
+		font-weight: bold;
+		font-family: iconfont;
+		line-height: 80rpx;
+	}
+
+	.search {
+		flex: 7;
+		border-width: 1px;
+		border-color: #ccc;
+		border-style: solid;
+		flex-direction: row;
+		background-color: #fff;
+		border-radius: 30rpx;
+	}
+
+	.search_icon {
+		flex: 1;
+		line-height: 80rpx;
+		text-align: center;
+		font-family: iconfont;
+	}
+
+	.search_input {
+		flex: 6;
+		height: 80rpx;
+		font-size: 28rpx;
+	}
+
+	.think {
+		position: fixed;
+		top: 144rpx;
+		left: 0;
+		padding: 40rpx;
+		width: 750rpx;
+		background-color: #f1f2f4;
+	}
+
+	.think_key {
+		line-height: 100rpx;
+		lines: 1;
+		font-size: 32rpx;
+		color: #303032;
+		text-overflow: ellipsis;
+		border-bottom-width: 1px;
+		border-color: #e0e1e3;
+		border-style: solid;
+	}
+
+	.history {
+		padding: 30rpx 0;
+	}
+
+	.history_head {
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.hi_title {
+		color: #333;
+		font-size: 40rpx;
+		font-weight: bold;
+	}
+
+	.hi_clear {
+		color: #cda24a;
+		font-size: 30rpx;
+	}
+
+	.hi_main {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.hi_main_key {
+		font-size: 28rpx;
+		margin-top: 30rpx;
+		margin-left: 20rpx;
+		padding: 15rpx 30rpx;
+		background-color: #fff;
+		color: #303032;
+		border-radius: 40rpx;
+	}
+</style>

@@ -1,0 +1,42 @@
+<template>
+	<view class="c_referral">
+		<text class="desc">{{info.title}}</text>
+		<text class="more" v-if="info.isMore" @tap="handleMore">更多&#xe60e;</text>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			info: Object
+		},
+		methods: {
+			//点击跟多事件
+			handleMore() {
+				this.$emit('handleMore', this.info)
+			}
+		},
+	}
+</script>
+
+<style>
+	.c_referral {
+		height: 100rpx;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.desc {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.more {
+		padding: 10rpx;
+		font-size: 24rpx;
+		color: #666;
+		font-family: iconfont;
+	}
+</style>

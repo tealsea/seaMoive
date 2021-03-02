@@ -1,0 +1,68 @@
+<template>
+	<view class="content">
+		<high></high>
+		<c-tab-title :list="tabBar" :cIndex="currentIndex" @handleChangePage="cutPage" />
+		<t-logo />
+		<c-tab :list="tabBar" :cIndex="currentIndex" @handleCutPage="cutPage" v-if="currentIndex==i" v-for="(item,i) in rem" :key="item.id" />
+	</view>
+</template>
+
+<script>
+	import high from '@/components/common/high.nvue';
+	import tLogo from '@/components/t-logo/t-logo.vue';
+	import cTab from '@/components/common/c-tab.nvue';
+	import cTabTitle from '@/components/common/c-tab-title.nvue';
+	import {
+		mapState
+	} from 'vuex';
+	export default {
+		data() {
+			return {
+				currentIndex: 0
+			}
+		},
+		computed: {
+			...mapState({
+				tabBar: state => state.home.type,
+				rem: state => state.home.rem,
+				cate: state => state.home.cate,
+				area: state => state.home.area
+			})
+		},
+		components: {
+			high,
+			tLogo,
+			cTab,
+			cTabTitle
+		},
+		methods: {
+			// 切换不同分类页面
+			cutPage(i) {
+				if (i === this.currentIndex) return;
+				this.currentIndex = i;
+				const rem = this.rem[i]
+				const area = this.area
+				if (rem.listData && rem.listData.length === 0) {
+					uni.showLoading({
+						title:'加载中~'
+					})
+					// 获取列表数据
+					for (let j = 0; j < area.length; j++) {
+						this.$store.dispatch('getListData', {
+							id: i,
+							area: area[j],
+							limit: 6
+						})
+					}
+				}
+			}
+		}
+	}
+</script>
+<style>
+	.content {
+		flex: 1;
+		background-color: #f1f2f4;
+		padding: 0 30rpx;
+	}
+</style>

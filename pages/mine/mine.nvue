@@ -1,0 +1,118 @@
+<template>
+	<view class="mine">
+		<t-title :info="info" />
+		<view class="line">
+			<text class="photo">{{login.name.slice(0,1)}}</text>
+			<text class="title">{{login.name}}</text>
+			<button type="warn" size="mini" @tap="isInput=true">修改</button>
+		</view>
+		<view class="input_box" v-if="isInput">
+			<input @confirm="handleBlur" confirm-type="done" :key="10" :value="login.name" :maxlength="10" focus class="input" />
+			<view class="btn">
+				<button type="primary" size="mini">确定</button>
+				<button type="default" size="mini" @tap="isInput=false">取消</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import login_mixin from '@/static/js/login_mixin.js';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '我的资料',
+					back: true,
+					search: true
+				},
+				isInput: false
+			}
+		},
+		components: {
+			tTitle
+		},
+		mixins: [login_mixin],
+		methods: {
+			// 失去焦点
+			handleBlur(e) {
+				const v = e.detail.value.trim()
+				if (this.login.name === v) {
+					uni.showToast({
+						title: '未修改昵称',
+						icon: 'none'
+					})
+					return
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否修改昵称',
+					success: function(res) {
+						if (res.confirm) {
+							console.log('是')
+						} else if (res.cancel) {
+							console.log('否')
+						}
+					}
+				})
+				this.isInput = false;
+			}
+		}
+	}
+</script>
+
+<style>
+	.mine {
+		flex: 1;
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+	}
+
+	.line {
+		height: 500rpx;
+		justify-content: center;
+		align-items: center;
+		background-color: #ffcd42;
+		border-radius: 20rpx;
+
+	}
+
+	.photo {
+		width: 150rpx;
+		line-height: 150rpx;
+		background-color: #fff;
+		border-radius: 50%;
+		font-size: 40rpx;
+		font-weight: bold;
+		color: teal;
+		text-align: center;
+	}
+
+	.title {
+		font-size: 35rpx;
+		color: #fff;
+		margin: 50rpx 0;
+	}
+
+	.input_box {
+		flex: 1;
+		background-color: #fff;
+		padding: 0 30rpx;
+	}
+
+	.input {
+		padding-left: 20rpx;
+		height: 100rpx;
+		border-width: 1px;
+		border-color: #ccc;
+		font-size: 30rpx;
+		border-radius: 10rpx;
+	}
+
+	.btn {
+		margin-top: 30rpx;
+		flex-direction: row;
+		justify-content: space-around;
+	}
+</style>

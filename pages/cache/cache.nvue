@@ -1,0 +1,35 @@
+<template>
+	<view class="cache">
+		<t-title :info="info"></t-title>
+		<image src="@/static/img/logo/null.png" mode="aspectFill"></image>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	export default {
+		data() {
+			return {
+				info: {
+					title: '本地缓存',
+					back: true,
+					search: true
+				}
+			}
+		},
+		components: {
+			tTitle
+		},
+		methods: {
+
+		}
+	}
+</script>
+
+<style>
+	.cache {
+		flex: 1;
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+	}
+</style>

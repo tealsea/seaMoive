@@ -1,0 +1,19 @@
+<template>
+	<view class="hight" :style="{height:high+'rpx'}"></view>
+</template>
+
+<script>
+	export default {
+		computed: {
+			high() {
+				return this.$store.state.high * 2;
+			}
+		}
+	}
+</script>
+
+<style>
+	.hight {
+		width: 750rpx;
+	}
+</style>

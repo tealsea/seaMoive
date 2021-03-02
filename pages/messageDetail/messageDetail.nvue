@@ -1,0 +1,55 @@
+<template>
+	<view class="msgDetail">
+		<t-title :info="info"></t-title>
+		<mp-html :content="msg.art_content" @load="handleLoad" />
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import mpHtml from '@/components/mp-html/mp-html'
+	export default {
+		computed: {
+			msg() {
+				const msg = this.$store.state.message.currentData.data
+				return msg
+			}
+		},
+		data(){
+			return{
+				info:{
+					title:'返回',
+					back:true,
+					search:false
+				}
+			}
+		},
+		components: {
+			mpHtml,
+			tTitle
+		},
+		created() {
+			uni.showLoading({
+				title: '加载中~'
+			})
+		},
+		methods: {
+			// 渲染完成时触发
+			handleLoad() {
+				uni.hideLoading();
+			}
+		}
+	}
+</script>
+
+<style>
+	.msgDetail {
+		padding: 30rpx;
+	}
+
+	.title {
+		font-size: 35rpx;
+		color: #333;
+		padding: 20rpx 0;
+	}
+</style>

@@ -1,0 +1,107 @@
+<template>
+	<view class="beg">
+		<t-title :info="info"></t-title>
+		<uni-notice-bar showIcon="true" text="请求添加的影片会优先上架高清4k。在QQ群(833979066)留言会更快被回应" />
+		<input class="input" type="text" @confirm="handleConfirm" confirm-type="done" placeholder="请留下您的问题" :value="value" />
+		<t-beg v-if="list.length>0" :list="list"></t-beg>
+		<image v-else src="@/static/img/logo/null.png" mode="aspectFill"></image>
+	</view>
+</template>
+
+<script>
+	import tTitle from '@/components/t-title/t-title.vue';
+	import tBeg from '@/components/t-beg/t-beg.nvue';
+	import uniNoticeBar from '@/components/uni-notice-bar/uni-notice-bar.vue'
+	export default {
+		data() {
+			return {
+				info: {
+					title: '求片留言',
+					back: true,
+					search: true
+				},
+				value: ''
+			}
+		},
+		computed: {
+			list() {
+				return this.$store.state.login.gbook || []
+			}
+		},
+		components: {
+			tTitle,
+			tBeg,
+			uniNoticeBar
+		},
+		created() {
+			this.getGbook()
+		},
+		methods: {
+			// 点击键盘完成留言
+			handleConfirm(e) {
+				this.value = '';
+				const info = uni.getStorageSync('logo_cookie');
+				const v = e.detail.value.trim();
+				// 判断是否登录
+				if (!info.name) {
+					uni.showModal({
+						title: '您未登录',
+						content: '是否前往登录',
+						success: res => {
+							if (res.confirm) {
+								uni.navigateTo({
+									url: '/pages/login/login'
+								})
+							}
+						}
+					})
+					return;
+				}
+				if (v) {
+					uni.showLoading({
+						title: '正在留言~'
+					})
+					this.$store.dispatch('sendGbook', {
+						name: info.name,
+						content: v
+					})
+					return
+				}
+				uni.showToast({
+					title: '内容不能为空',
+					icon: 'none'
+				})
+			},
+			//请求数据
+			getGbook() {
+				uni.showLoading({
+					title: '加载中~'
+				})
+				this.$store.dispatch('getGbook');
+			}
+		}
+	}
+</script>
+
+<style>
+	.beg {
+		flex: 1;
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+	}
+
+	.notice {
+		color: red;
+		font-size: 30rpx;
+	}
+
+	.input {
+		height: 100rpx;
+		padding: 0 30rpx;
+		border-width: 1px;
+		font-size: 30rpx;
+		border-color: #999;
+		border-radius: 30rpx;
+		background-color: #fff;
+	}
+</style>

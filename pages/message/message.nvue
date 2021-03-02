@@ -1,0 +1,83 @@
+<template>
+	<view class="message">
+		<high></high>
+		<t-logo />
+		<list @loadmore="handleLoad">
+			<cell class="cell" v-for="(item,index) in list" :key="item.art_id" v-if="list.length>0">
+				<view class="box" @tap="handleMsg(item,index)">
+					<text class="title">{{item.art_name}}</text>
+					<image class="list_img" :src="item.art_pic" mode="aspectFill" />
+				</view>
+			</cell>
+		</list>
+	</view>
+</template>
+
+<script>
+	import high from '@/components/common/high.nvue';
+	import tLogo from '@/components/t-logo/t-logo.vue';
+	export default {
+		components: {
+			high,
+			tLogo
+		},
+		methods: {
+			// 加载数据
+			handleLoad() {
+				uni.showLoading({
+					mask: true,
+					title: '正在加载~'
+				})
+				this.$store.dispatch('getMsg', this.page)
+			},
+			// 跳转到详情页
+			handleMsg(data, flag) {
+				this.$store.commit('alterCurMsg', {
+					data,
+					flag
+				});
+				uni.navigateTo({
+					url: "/pages/messageDetail/messageDetail",
+					animationType: 'pop-in',
+					animationDuration: 200
+				})
+			}
+		},
+		computed: {
+			page() {
+				return this.$store.state.message.page || 1;
+			},
+			list() {
+				return this.$store.state.message.data || []
+			}
+		},
+		created() {
+			this.handleLoad()
+		}
+	}
+</script>
+
+<style>
+	.message {
+		flex: 1;
+		padding: 0 20rpx;
+		border-radius: 20rpx;
+	}
+
+	.box {
+		margin-bottom: 40rpx;
+		background-color: #f1f2f4;
+	}
+
+	.title {
+		font-size: 35rpx;
+		color: #666;
+		font-weight: bold;
+		padding: 20rpx;
+	}
+
+	.list_img {
+		height: 400rpx;
+		border-radius: 20rpx;
+	}
+</style>

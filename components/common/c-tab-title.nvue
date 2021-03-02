@@ -1,0 +1,44 @@
+<template>
+	<view class="c-tab-title">
+		<text class="c_title" :class="{c_aTitle:index===cIndex}" v-for="(item,index) in list" :key="item.type_id" @tap="handleTitle(index)">
+			{{item.type_name}}
+		</text>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			list: Array,
+			cIndex: Number
+		},
+		methods: {
+			// 点击切换任务栏
+			handleTitle(i) {
+				if (i !== this.cIndex) {
+					this.$emit('handleChangePage', i)
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+	.c-tab-title {
+		height: 100rpx;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.c_title {
+		flex: 1;
+		color: #666;
+		font-weight: bold;
+		font-size: 35rpx;
+	}
+
+	.c_aTitle {
+		color: #faa755;
+	}
+</style>

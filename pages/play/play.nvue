@@ -1,0 +1,354 @@
+<template>
+	<view class="play" v-if="list.length>0">
+		<t-title :info="{title:info.vod_name+'-'+list[index].num,back:true,search:false}"></t-title>
+		<!-- 视频 -->
+		<video page-gesture autoplay :src="list[index].url" :title="info.vod_name+'-'+list[index].num" @fullscreenchange="handleFullscreen"
+		 id="myVideo" @controlstoggle="handleStoggle" @ended="handleEnded" controls>
+			<cover-view class="right" v-if="isFullScreen">
+				<text class="more" v-if="!isShowFullMore&&stoggle" @tap.stop="isShowFullMore=true">选集</text>
+				<text class="close" @tap.stop="isShowFullMore=false" v-if="isShowFullMore">&#xe605;</text>
+				<scroll-view scroll-y :show-scrollbar="false" class="num_box more_num full_box" v-if="isShowFullMore">
+					<text class="num common_style" :class="{a_num:index==i}" v-for="(item,i) in list" :key="item.num" @tap="handleCutNum(i)">{{item.num}}</text>
+				</scroll-view>
+			</cover-view>
+		</video>
+		<!-- 视频信息 -->
+		<list>
+			<!-- 基本信息 -->
+			<cell class="show_page">
+				<view class="info">
+					<view class="title_box">
+						<text class="title common_style">{{info.vod_name}}</text>
+						<text class="collect" :class="{collect_a:this.isCollect}" @tap="handleCollect">&#xe6ed;</text>
+					</view>
+					<text class="date common_style">日期：{{info.vod_year+'/'+info.vod_lang}}</text>
+					<text class="common_style">演员：{{info.vod_actor}}</text>
+					<text class="sequel common_style">更新：{{info.vod_remarks}}</text>
+					<text class="desc common_style">简介：{{info.vod_blurb}}</text>
+				</view>
+				<!-- 选集 -->
+				<view class="tv">
+					<text class="anthology">选集</text>
+					<text class="right_num" @tap="isAllNum=!isAllNum">{{unfold}}&#xe60e;</text>
+				</view>
+				<scroll-view scroll-x :show-scrollbar="false" :class="{more_num:isAllNum}" class="num_box">
+					<text class="num common_style" :class="{a_num:index==i}" v-for="(item,i) in list" :key="item.num" @tap="handleCutNum(i)">{{item.num}}</text>
+				</scroll-view>
+				<!-- 相关推荐 -->
+				<c-referral :info="related"></c-referral>
+				<c-list :list="relateds"></c-list>
+			</cell>
+		</list>
+	</view>
+</template>
+<script>
+	import {
+		collectOrcancel
+	} from '@/request/play.js';
+	import tTitle from '@/components/t-title/t-title.vue';
+	import cReferral from '@/components/common/c-referral.nvue';
+	import cList from '@/components/common/c-list.nvue';
+	export default {
+		data() {
+			return {
+				id: 0, ///vid
+				index: 0, //集数
+				isShowFullMore: false, //全屏集数
+				isAllNum: false, //显示更多
+				stoggle: false, //进度等基础显示
+				isFullScreen: false, //全屏控制
+				related: {
+					title: '相关推荐',
+					isMore: false
+				},
+				history: [], //历史记录
+				hiIndex: -1, //历史位置
+				collect: [], //收藏
+				coIndex: -1, //收藏位置
+			}
+		},
+		components: {
+			tTitle,
+			cList,
+			cReferral
+		},
+		onLoad(arg) {
+			this.id = arg.id;
+			uni.showLoading({
+				title: '加载中~',
+				mask: true
+			})
+			this.$store.dispatch('getVideo', this.id);
+		},
+		mounted() {
+			this.history = uni.getStorageSync('seaHistory') || [];
+			this.hiIndex = this.history.findIndex(item => item.vod_id == this.id)
+			if (this.hiIndex >= 0) {
+				const data = this.history[this.hiIndex];
+				this.index = data.index;
+			}
+		},
+		created() {
+			this.getCollect()
+		},
+		onUnload() {
+			this.saveHistory()
+		},
+		computed: {
+			isCollect() {
+				return this.coIndex >= 0 ? true : false;
+			},
+			unfold() {
+				if (this.isAllNum) {
+					return '收起'
+				}
+				return '展开'
+			},
+			list() {
+				const info = this.info || {};
+				let url = info.vod_play_url;
+				if (!url) return []
+				if (info.vod_play_note) {
+					url = url.split(info.vod_play_note)[0]
+				}
+				const list = url.split('#');
+				const arr = []
+				list.forEach(item => {
+					const data = item.split('$');
+					const obj = {
+						num: data[0],
+						url: data[1]
+					}
+					arr.push(obj)
+				})
+				return arr
+			},
+			info() {
+				return this.$store.state.play.video || {}
+			},
+			relateds() {
+				return this.$store.state.play.related || []
+			}
+		},
+
+		methods: {
+			// 获取收藏
+			getCollect() {
+				this.collect = uni.getStorageSync('seaCollect') || [];
+				this.coIndex = this.collect.findIndex(item => item.vod_id == this.id);
+			},
+			// 收藏或取消
+			async handleCollect() {
+				const login = uni.getStorageSync('logo_cookie') || {};
+				let operate = "add";
+				const collect = this.isCollect;
+				if (!login.cookie) {
+					uni.showModal({
+						title: '未登录',
+						content: '是否进行登录',
+						success: function(res) {
+							if (res.confirm) {
+								uni.navigateTo({
+									url: '/pages/login/login'
+								})
+							}
+						}
+					})
+					return
+				};
+				if (collect) {
+					operate = 'remove';
+					this.collect.splice(this.coIndex, 1)
+				} else {
+					const info = this.info;
+					const vod_id = info.vod_id;
+					const vod_pic = info.vod_pic;
+					const vod_name = info.vod_name;
+					this.collect.unshift({
+						vod_id,
+						vod_pic,
+						vod_name
+					})
+				}
+				const vod_id = this.id;
+				const id = login.id;
+				await collectOrcancel(id, vod_id, operate);
+				uni.setStorageSync('seaCollect', this.collect);
+				this.getCollect();
+			},
+			// 储存历史
+			saveHistory() {
+				if (this.info) {
+					if (this.hiIndex >= 0) {
+						this.history.splice(this.hiIndex, 1);
+					}
+					const info = this.info;
+					this.history.unshift({
+						vod_id: info.vod_id,
+						vod_name: info.vod_name,
+						vod_pic: info.vod_pic,
+						index: this.index
+					})
+					if (this.history.length > 20) {
+						this.history.length = 20;
+					}
+					uni.setStorageSync('seaHistory', this.history);
+					this.$store.commit('alterVideo', {})
+				}
+			},
+			// 视频播放结束
+			handleEnded() {
+				const index = this.index;
+				const list = this.list.length;
+				if (index + 1 >= list) {
+					uni.showToast({
+						title: "没有更多了~",
+						icon: 'none'
+					})
+					return
+				}
+				this.index++;
+			},
+			//切换视频
+			handleCutNum(index) {
+				if (index === this.index) return
+				this.index = index;
+			},
+			// 视频控件显示或隐藏式触发
+			handleStoggle(e) {
+				this.stoggle = e.detail.show
+			},
+			// 点击全屏按钮触发
+			handleFullscreen(e) {
+				if (e.detail.fullScreen) {
+					plus.screen.lockOrientation("landscape");
+				}
+				this.isFullScreen = e.detail.fullScreen
+			}
+		}
+	}
+</script>
+
+<style>
+	.play {
+		flex: 1
+	}
+
+	.show_page {
+		padding: 30rpx;
+	}
+
+	.common_style {
+		lines: 2;
+		text-overflow: ellipsis;
+		font-size: 30rpx;
+		color: #333;
+		margin-top: 20rpx;
+	}
+
+	.title_box {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.title {
+		flex: 5;
+		color: #edd290;
+		font-size: 40rpx;
+		font-weight: bold;
+	}
+
+	.collect {
+		flex: 1;
+		font-family: iconfont;
+		font-size: 50rpx;
+		text-align: center;
+		color: #ccc;
+	}
+
+	.collect_a {
+		color: #de5448;
+	}
+
+	.desc {
+		lines: 4;
+	}
+
+	.tv {
+		margin-top: 60rpx;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.tv .anthology {
+		font-size: 40rpx;
+		font-weight: bold;
+	}
+
+	.num_box {
+		flex-direction: row;
+	}
+
+	.more_num {
+		flex-wrap: wrap;
+	}
+
+	.full_box {
+		flex: 1;
+		padding: 100rpx;
+	}
+
+	.close {
+		width: 200rpx;
+		height: 50rpx;
+		color: #fff;
+		font-size: 40rpx;
+		text-align: center;
+		font-family: iconfont;
+		position: absolute;
+		right: 30rpx;
+		top: 30rpx;
+	}
+
+	.right_num {
+		font-size: 30rpx;
+		font-family: iconfont;
+		color: #999;
+	}
+
+	.num_box .num {
+		padding: 10rpx 20rpx;
+		border-width: 1px;
+		border-radius: 10rpx;
+		border-style: solid;
+		border-color: #999;
+		background-color: #fff;
+		color: #666;
+		width: 160rpx;
+		margin-left: 12.5rpx;
+		text-align: center;
+		lines: 1;
+	}
+
+	.num_box .a_num {
+		background-color: #ffcd42;
+		color: #fff;
+		border-color: #ffcd42;
+	}
+
+	.right {
+		flex: 1;
+	}
+
+	.more {
+		color: #eee;
+		position: absolute;
+		top: 30rpx;
+		right: 30rpx;
+		width: 200rpx;
+		z-index: 1;
+		height: 70rpx;
+		text-align: center;
+		font-size: 30rpx;
+	}
+</style>

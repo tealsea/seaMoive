@@ -1,0 +1,100 @@
+<template>
+	<view class="t_list">
+		<view class="item" v-for="item in list" :key="item.vod_id" @tap="handleVideo(item)">
+			<image class="item_img_s" src="@/static/img/logo/load.png" mode="aspectFit"></image>
+			<image class="item_img" :src="item.vod_pic" mode="aspectFill"></image>
+			<view class="info">
+				<text class="title common_line">{{item.vod_name}}</text>
+				<text class="date common_line common_size">{{item.vod_year+'/'+item.vod_lang}}</text>
+				<text class="author common_line common_size">{{item.vod_actor}}</text>
+				<text class="sequel common_line common_size">{{item.vod_remarks}}</text>
+				<text class="desc common_line common_size">{{item.vod_actor}}</text>
+				<view class="play">
+					<text class="play_btn common_size">立即播放</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import play_mixin from '@/static/js/play_mixin.js';
+	export default {
+		props: {
+			list: Array
+		},
+		mixins: [play_mixin]
+	}
+</script>
+
+<style>
+	.item {
+		height: 370rpx;
+		flex-direction: row;
+		background-color: #f1f2f4;
+		border-radius: 20rpx;
+		padding: 20rpx;
+		margin-top: 20rpx;
+	}
+
+	.item_img {
+		flex: 3;
+		padding-right: 40rpx;
+		border-radius: 20rpx;
+	}
+
+	.item_img_s {
+		width: 200rpx;
+		height: 370rpx;
+		position: absolute;
+		left: 20rpx;
+		top: 0;
+	}
+
+	.common_line {
+		lines: 1;
+		text-overflow: ellipsis;
+	}
+
+	.common_size {
+		font-size: 30rpx;
+		color: #999;
+	}
+
+	.info {
+		flex: 4;
+		justify-content: space-between;
+	}
+
+	.title_box {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.title {
+		font-size: 35rpx;
+		font-weight: bold;
+		color: #2c2c2c;
+	}
+
+	.sequel {
+		color: #e3ae70;
+	}
+
+	.desc {
+		lines: 2;
+	}
+
+	.play {
+		align-items: flex-end;
+	}
+
+	.play_btn {
+		width: 200rpx;
+		background-color: #f4d03a;
+		color: #333;
+		text-align: center;
+		line-height: 70rpx;
+		border-radius: 20rpx;
+	}
+</style>

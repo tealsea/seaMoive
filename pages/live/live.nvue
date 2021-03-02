@@ -1,0 +1,83 @@
+<template>
+	<view class="live">
+		<high></high>
+		<t-logo></t-logo>
+		<scroll-view :show-scrollbar="false" scroll-y class="t_live_box">
+			<view class="item" v-for="(item,i) in list" :key="item.id" @tap="handleLive(i)">
+				<image class="item_img" :src="item.pic" mode="aspectFit"></image>
+				<text class="name">{{item.name}}</text>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script>
+	import high from '@/components/common/high.nvue';
+	import tLogo from '@/components/t-logo/t-logo.vue';
+	export default {
+		created() {
+			this.getLive();
+		},
+		computed: {
+			list() {
+				return this.$store.state.live.lives || []
+			}
+		},
+		components: {
+			high,
+			tLogo
+		},
+		methods: {
+			// 获取直播信息
+			getLive() {
+				if (this.list.length <= 0) {
+					uni.showLoading({
+						title:'加载中~'
+					})
+					this.$store.dispatch('getLive')
+				}
+			},
+			// 进入点击的直播
+			handleLive(id) {
+				uni.navigateTo({
+					url: '/pages/liveTv/liveTv?id=' + id
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.live {
+		padding: 0 30rpx;
+		background-color: #f1f2f4;
+		flex: 1;
+	}
+
+	.t_live_box {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	.item {
+		width: 330rpx;
+		background-color: #aaa;
+		margin-top: 20rpx;
+		border-radius: 20rpx;
+		align-items: center;
+	}
+
+	.item_img {
+		width: 200rpx;
+		height: 200rpx;
+	}
+
+	.name {
+		font-size: 40rpx;
+		color: #fff;
+		font-weight: bold;
+		text-align: center;
+		padding-bottom: 30rpx;
+	}
+</style>

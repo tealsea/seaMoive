@@ -1,0 +1,75 @@
+<template>
+	<view class="list">
+		<high />
+		<t-search :isHistory="false" :isFocus="false" @handleConfirm="goSearch" />
+		<list v-if="list.length>0" :show-scrollbar="false" @loadmore="handleLoadMore">
+			<cell>
+				<t-list :list="list" />
+			</cell>
+		</list>
+		<image v-else src="@/static/img/logo/null.png" mode="aspectFill"></image>
+	</view>
+</template>
+
+<script>
+	import high from '@/components/common/high.nvue';
+	import tSearch from '@/components/t-search/t-search.nvue';
+	import tList from '@/components/common/t-list.nvue';
+	export default {
+		data() {
+			return {
+				wd: '',
+				page: 1
+			}
+		},
+		components: {
+			high,
+			tSearch,
+			tList
+		},
+		computed: {
+			list() {
+				return this.$store.state.list.searchData || [];
+			}
+		},
+		onLoad(arg) {
+			this.$store.commit('alterSearchData', [])
+			this.wd = arg.wd;
+			this.getSearchData()
+		},
+		methods: {
+			// 加载更多
+			handleLoadMore() {
+				if (this.list % 20 === 0) {
+					this.page++;
+					this.getSearchData()
+				}
+			},
+			// 搜索视频
+			goSearch(e) {
+				this.wd = e;
+				this.$store.commit('alterSearchData', []);
+				this.getSearchData()
+			},
+			// 获取搜索数据
+			getSearchData() {
+				uni.showLoading({
+					title: '加载中~'
+				})
+				const page = this.page;
+				const wd = this.wd;
+				this.$store.dispatch('getSearchData', {
+					wd,
+					page
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.list {
+		flex: 1;
+		padding: 0 20rpx;
+	}
+</style>
